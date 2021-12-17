@@ -26,9 +26,9 @@ public class DownloaderAgent {
         return null;
     }
 
-    public static String readJsonFromGitHub(String page, int tokenIndex) throws IOException {
+    public static String readJsonFromGitHub(String page, int tokenIndex, String cachePath) throws IOException {
         // String building ..
-        String res = getFromLocal("cache/" + URLEncoder.encode(page, StandardCharsets.UTF_8));
+        String res = getFromLocal(cachePath + URLEncoder.encode(page, StandardCharsets.UTF_8));
         if (res != null){
             return res;
         }

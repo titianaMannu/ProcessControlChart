@@ -21,7 +21,7 @@ public class JIRAInformation {
 	private static JIRAInformation instance = null;
 
 
-	private List<JIRAContent> jiraTicketPages = new ArrayList<>();
+	private final List<JIRAContent> jiraTicketPages = new ArrayList<>();
 
 
 	public static JIRAInformation getInstance() {
@@ -40,9 +40,9 @@ public class JIRAInformation {
 		// configuration file
 		String project = JSONConfig.getProjectName();
 		String type = JSONConfig.getIssueType();
-		Integer i = 0;
-		Integer j;
-		Integer total;
+		int i = 0;
+		int j;
+		int total;
 		Gson gson = new Gson();
 		do {
 			// Only gets a max of 1000 at a time, so must do this multiple times if bugs

@@ -43,6 +43,18 @@ public class CommitsInformation {
         commitsInfo = new CommitInfo[0];
     }
 
+    private void downloadCommits(String url, int tokenIndex, String cachePath, int j, String[] list){
+        String reString = null;
+        try {
+            reString = DownloaderAgent.readJsonFromGitHub(url, tokenIndex, cachePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        fillJsonList(reString, j, list);
+
+    }
+
     public CommitInfo[] retrieveCommits(String queryString) throws InterruptedException {
         /* Get project name */
         int requestPerThread = 30;
@@ -59,18 +71,7 @@ public class CommitsInformation {
                 String url = JSONConfig.getRepository() + project.toLowerCase(Locale.ROOT) + "/commits?page=" + currpage
                         + "&per_page=100" + queryString;
                 final int j = i;
-                es.execute(() -> {
-                    String reString = null;
-                    try {
-                        reString = DownloaderAgent.readJsonFromGitHub(url, tokenIndex);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    fillJsonList(reString, j, list);
-
-                });
-
+                es.execute(() -> downloadCommits(url, tokenIndex,"cache/" , j, list));
                 currpage++;
 
             }
