@@ -31,7 +31,7 @@ public class TicketLinker {
 
     private final Map<YearMonth, Integer> fixedBugPerMonth;
     //list of all commits in descendent order; most recent is the first one
-    private CommitInfo[] infos;
+    private final CommitInfo[] infos;
 
     private static TicketLinker instance = null;
 
@@ -192,7 +192,6 @@ public class TicketLinker {
     }
 
     public static void main(String[] args) throws InterruptedException {
-
         TicketLinker linker = TicketLinker.getInstance();
 
         Map<YearMonth, Integer> fixedCommitPerMonth = linker.countFixedBugPerMonth();

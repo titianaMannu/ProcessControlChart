@@ -57,7 +57,7 @@ public class CommitsInformation {
 
     public CommitInfo[] retrieveCommits(String queryString) throws InterruptedException {
         /* Get project name */
-        int requestPerThread = 30;
+        int requestPerThread = 10;
         String project = JSONConfig.getProjectName();
         int currpage = 1;
         boolean endCondition;
@@ -71,7 +71,7 @@ public class CommitsInformation {
                 String url = JSONConfig.getRepository() + project.toLowerCase(Locale.ROOT) + "/commits?page=" + currpage
                         + "&per_page=100" + queryString;
                 final int j = i;
-                es.execute(() -> downloadCommits(url, tokenIndex,"cache/" , j, list));
+                es.execute(() -> downloadCommits(url, tokenIndex,"cache/commits/" , j, list));
                 currpage++;
 
             }

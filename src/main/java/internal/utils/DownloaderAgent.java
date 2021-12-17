@@ -6,7 +6,10 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +21,7 @@ public class DownloaderAgent {
 
     private static String getFromLocal(String filename) throws IOException {
         File f = new File(filename);
-        if(f.exists()) { /* show alert */
+        if (f.exists()) { /* show alert */
             byte[] encoded = Files.readAllBytes(Paths.get(filename));
             return new String(encoded);
         }
@@ -27,9 +30,13 @@ public class DownloaderAgent {
     }
 
     public static String readJsonFromGitHub(String page, int tokenIndex, String cachePath) throws IOException {
+        if (! Files.exists(Paths.get(cachePath))) {
+            //create new directory to save cached data
+            Files.createDirectories(Path.of(cachePath));
+        }
         // String building ..
         String res = getFromLocal(cachePath + URLEncoder.encode(page, StandardCharsets.UTF_8));
-        if (res != null){
+        if (res != null) {
             return res;
         }
 
@@ -44,7 +51,10 @@ public class DownloaderAgent {
                 url = new URL(page);
                 URLConnection conn = url.openConnection();
 
-                conn.setRequestProperty("Authorization", JSONConfig.getEncodedTocken(tokenIndex));
+                conn.setRequestProperty(
+                        URLEncoder.encode("Authorization: token ", StandardCharsets.UTF_8),
+                        Arrays.toString(Base64.getDecoder().decode(JSONConfig.getEncodedTocken(tokenIndex)))
+                );
                 // String building ..
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String inputLine;
@@ -61,20 +71,51 @@ public class DownloaderAgent {
                     System.exit(1);
                 }
                 tokenIndex = count++;
-                if (count > 5) {
+                if (count > 2) {
                     threshold++;
                     count = 0;
                 }
             }
         } while (!exitCondition);
 
-        if ( !builder.toString().equals("[]\n")){
-            PrintWriter out = new PrintWriter("cache/" + URLEncoder.encode(page, StandardCharsets.UTF_8));
+        if (!builder.toString().equals("[]\n")) {
+            PrintWriter out = new PrintWriter(cachePath + URLEncoder.encode(page, StandardCharsets.UTF_8));
             out.println(builder);
             out.close();
         }
 
         return builder.toString().trim();
 
+    }
+
+
+    public static String readJsonFromJira(String url, String cachePath, Integer filename) throws IOException {
+        if (! Files.exists(Paths.get(cachePath))) {
+            //create new directory to save cached data
+            Files.createDirectories(Path.of(cachePath));
+        }
+        String res = getFromLocal(cachePath + filename);
+        if (res != null) {
+            return res;
+        }
+        // String building ..
+        StringBuilder builder = new StringBuilder();
+        InputStream is = new URL(url).openStream();
+        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
+        try (BufferedReader bufferedReader = new BufferedReader(reader)) {
+            String inputLine;
+            while ((inputLine = bufferedReader.readLine()) != null) {
+                builder.append(inputLine);
+                builder.append(System.lineSeparator());
+            }
+        }
+
+        if (!builder.toString().equals("[]\n")) {
+            PrintWriter out = new PrintWriter(cachePath + filename);
+            out.println(builder);
+            out.close();
+        }
+        // return a string containing the page content
+        return builder.toString().trim();
     }
 }

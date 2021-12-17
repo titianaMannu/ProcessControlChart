@@ -1,17 +1,12 @@
 package main.java.internal.data_scraping;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.java.internal.utils.DownloaderAgent;
 import main.java.internal.utils.JSONConfig;
 import main.java.internal.entities.jira_entities.JIRAContent;
-
 import com.google.gson.Gson;
 
 
@@ -52,29 +47,12 @@ public class JIRAInformation {
 					+ type + "%22AND(%22status%22=%22closed%22OR"
 					+ "%22status%22=%22resolved%22)AND%22resolution%22=%22fixed%22&fields=key,resolutiondate,versions,created&startAt="
 					+ i + "&maxResults=" + j;
-			String jsonStr = getJsonFromURL(url);
+			String jsonStr = DownloaderAgent.readJsonFromJira(url, "cache/jira/bug/", i);
 			JIRAContent currJiraContent = gson.fromJson(jsonStr, JIRAContent.class);
 			this.jiraTicketPages.add(currJiraContent);
 			total = currJiraContent.getTotal();
 			i = j;
 		} while (i < total);
-
-	}
-
-	private String getJsonFromURL(String url) throws IOException {
-		// String building ..
-		StringBuilder builder = new StringBuilder();
-		InputStream is = new URL(url).openStream();
-		InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
-		try (BufferedReader bufferedReader = new BufferedReader(reader)) {
-			String inputLine;
-			while ((inputLine = bufferedReader.readLine()) != null) {
-				builder.append(inputLine);
-				builder.append(System.lineSeparator());
-			}
-		}
-		// return a string containing the page content
-		return builder.toString().trim();
 
 	}
 
