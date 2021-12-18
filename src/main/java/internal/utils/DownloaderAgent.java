@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,10 +50,9 @@ public class DownloaderAgent {
                 url = new URL(page);
                 URLConnection conn = url.openConnection();
 
-                conn.setRequestProperty(
-                        URLEncoder.encode("Authorization: token ", StandardCharsets.UTF_8),
-                        Arrays.toString(Base64.getDecoder().decode(JSONConfig.getEncodedTocken(tokenIndex)))
-                );
+                String token = new String(Base64.getDecoder().decode(JSONConfig.getEncodedTocken(tokenIndex)), StandardCharsets.UTF_8);
+                token = token.replace("\n", "");
+                conn.setRequestProperty("Authorization", "token " + token);
                 // String building ..
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String inputLine;
