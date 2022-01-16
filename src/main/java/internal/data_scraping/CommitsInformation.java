@@ -36,25 +36,32 @@ public class CommitsInformation {
     }
 
     /**
-     *
+     * private constructor
      */
     private CommitsInformation() {
         super();
         commitsInfo = new CommitInfo[0];
     }
 
-    private void downloadCommits(String url, int tokenIndex, String cachePath, int j, String[] list){
+    private void downloadCommits(String url, int tokenIndex, String cachePath, int j, String[] list) {
         String reString = null;
         try {
             reString = DownloaderAgent.readJsonFromGitHub(url, tokenIndex, cachePath);
         } catch (IOException e) {
-            e.printStackTrace();
+           return;
         }
 
         fillJsonList(reString, j, list);
 
     }
 
+    /**
+     * MultiThread download of information from GitHub using REST API
+     *
+     * @param queryString Complete the query
+     * @return list of commits
+     * @throws InterruptedException
+     */
     public CommitInfo[] retrieveCommits(String queryString) throws InterruptedException {
         /* Get project name */
         int requestPerThread = 10;
@@ -71,7 +78,7 @@ public class CommitsInformation {
                 String url = JSONConfig.getRepository() + project.toLowerCase(Locale.ROOT) + "/commits?page=" + currpage
                         + "&per_page=100" + queryString;
                 final int j = i;
-                es.execute(() -> downloadCommits(url, tokenIndex,"cache/commits/" , j, list));
+                es.execute(() -> downloadCommits(url, tokenIndex, "cache/commits/", j, list));
                 currpage++;
 
             }
@@ -117,7 +124,11 @@ public class CommitsInformation {
         list[index] = json;
     }
 
-
+    /**
+     * Sort all commits in ascendant order
+     *
+     * @param infos list of commits
+     */
     private void sortCommitInfos(List<CommitInfo> infos) {
 
         Collections.sort(infos, (CommitInfo c1, CommitInfo c2) -> {

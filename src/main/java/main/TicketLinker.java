@@ -24,13 +24,15 @@ import java.util.logging.Logger;
  */
 public class TicketLinker {
     private static final Logger LOGGER = Logger.getLogger(TicketLinker.class.getName());
-    //ticket-key, last commit-date related to it
+    /** ticket-key, last commit-date related to it*/
     private final Map<String, LocalDate> ticketMap;
 
+    /**ticket-key, list of all commits whose comment contains the ticket-key*/
     private final Map<String, List<CommitInfo>> commitsPerTicketMap;
 
     private final Map<YearMonth, Integer> fixedBugPerMonth;
-    //list of all commits in descendent order; most recent is the first one
+
+    /**list of all commits in descendent order; most recent is the first one*/
     private final CommitInfo[] infos;
 
     private static TicketLinker instance = null;
@@ -53,6 +55,7 @@ public class TicketLinker {
         List<JIRAContent> ticketPerPageList;
         try {
             ticketPerPageList = jiraInformation.getJiraTickets();
+            //map initialization
             for (JIRAContent jiraContent : ticketPerPageList) {
                 for (Issue ticket : jiraContent.getIssues()) {
                     ticketMap.put(ticket.getKey(), LocalDate.MIN);
@@ -67,6 +70,9 @@ public class TicketLinker {
 
     }
 
+    /**
+     * Linkage commits to ticked based on the ticket-key and save the most recently date into the ticketMap
+     */
     public void ticketLink() {
         // initialization of a map for tickets <ticketKey, lastCommitDate>
         for (int i = 0; i < this.infos.length; i++) {

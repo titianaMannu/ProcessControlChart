@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class CSVBuilder {
 
 	/**
-	 *
+	 * private constructor
 	 */
 	private CSVBuilder() {
 		super();
@@ -28,7 +28,7 @@ public class CSVBuilder {
 	 */
 	public static void generateCommitCsv(Map<YearMonth, Tuple2<Integer, Integer>> mapToSaveOnCsv) {
 		String header = "Date,Nr. fixed commit,Nr. commit";
-		File out = new File("data.csv");
+		File out = new File("data-" + JSONConfig.getProjectName() + ".csv");
 		DateTimeFormatter f = DateTimeFormatter.ofPattern("y-MM");
 		try (FileOutputStream fos = new FileOutputStream(out);
 			 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))) {

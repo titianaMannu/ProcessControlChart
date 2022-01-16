@@ -28,6 +28,14 @@ public class DownloaderAgent {
         return null;
     }
 
+    /**
+     * This method is useful to download pages from GitHub by using REST API
+     * @param page url to download
+     * @param tokenIndex token to use
+     * @param cachePath check if the file is already in cache before downloading it
+     * @return page content
+     * @throws IOException
+     */
     public static String readJsonFromGitHub(String page, int tokenIndex, String cachePath) throws IOException {
         if (! Files.exists(Paths.get(cachePath))) {
             //create new directory to save cached data
@@ -86,7 +94,14 @@ public class DownloaderAgent {
 
     }
 
-
+    /**
+     * This method is useful to download pages from Jira by using REST API
+     * @param url url to download
+     * @param cachePath check if the file is already in cache before downloading it
+     * @param filename filename used to save information into the cache
+     * @return page content
+     * @throws IOException
+     */
     public static String readJsonFromJira(String url, String cachePath, Integer filename) throws IOException {
         if (! Files.exists(Paths.get(cachePath))) {
             //create new directory to save cached data
